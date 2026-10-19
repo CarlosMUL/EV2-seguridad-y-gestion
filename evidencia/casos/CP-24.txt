@@ -1,0 +1,15 @@
+CP-24 - Exposición de detalles técnicos en mensajes de error
+Requerimiento: NFR-SEG-5 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> GET /examenes/abc  [Authorization: Bearer <token>]
+< HTTP 500  (3 ms)
+  {"error":"Error al obtener examen médico","glosa":"invalid input syntax for type bigint: \"abc\""}
+
+> GET /pacientes/abc  [Authorization: Bearer <token>]
+< HTTP 500  (13 ms)
+  {"error":"Error al obtener paciente","glosa":"invalid input syntax for type bigint: \"abc\""}
+----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-15)
+Obtenido: GET /examenes/abc HTTP 500 y GET /pacientes/abc HTTP 500; el campo 'glosa' devuelve el mensaje interno de PostgreSQL ("invalid input syntax for type bigint: "abc""). El patrón err.message se repite en ~35 puntos del código (ver Semgrep).

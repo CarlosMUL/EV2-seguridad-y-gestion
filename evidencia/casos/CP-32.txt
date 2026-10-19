@@ -1,0 +1,59 @@
+CP-32 - Tiempo de respuesta de operaciones CRUD < 300 ms
+Requerimiento: NFR-PERF-1 | Tipo: Rendimiento
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> GET /examenes/2  [Authorization: Bearer <token>]
+< HTTP 200  (4 ms)
+  {"id":"2","tipo_examen_medico_id":"1","paciente_id":"1","diagnosis":"Sin hallazgos","tratamiento":null,"observaciones":"Paciente presenta mejoría","notas":null,"created_at":"2026-10-19T04:04:10.307Z","tipo_examen_nombre":"Hemograma completo","paciente_rut":"11111111-1","paciente_primer_nombre":"Juan","paciente_apellido_paterno":"Pérez","paciente_apellido_materno":"Gómez"}
+
+> GET /examenes/2  [Authorization: Bearer <token>]
+< HTTP 200  (3 ms)
+  {"id":"2","tipo_examen_medico_id":"1","paciente_id":"1","diagnosis":"Sin hallazgos","tratamiento":null,"observaciones":"Paciente presenta mejoría","notas":null,"created_at":"2026-10-19T04:04:10.307Z","tipo_examen_nombre":"Hemograma completo","paciente_rut":"11111111-1","paciente_primer_nombre":"Juan","paciente_apellido_paterno":"Pérez","paciente_apellido_materno":"Gómez"}
+
+> GET /examenes/2  [Authorization: Bearer <token>]
+< HTTP 200  (3 ms)
+  {"id":"2","tipo_examen_medico_id":"1","paciente_id":"1","diagnosis":"Sin hallazgos","tratamiento":null,"observaciones":"Paciente presenta mejoría","notas":null,"created_at":"2026-10-19T04:04:10.307Z","tipo_examen_nombre":"Hemograma completo","paciente_rut":"11111111-1","paciente_primer_nombre":"Juan","paciente_apellido_paterno":"Pérez","paciente_apellido_materno":"Gómez"}
+
+> GET /pacientes/1  [Authorization: Bearer <token>]
+< HTTP 200  (3 ms)
+  {"id":"1","rut":"11111111-1","primer_nombre":"Juan","apellido_paterno":"Pérez","apellido_materno":"Gómez","fecha_nacimiento":"1985-03-14T00:00:00.000Z","sexo":"M","nacionalidad":"Chilena","estado_civil":"casado","email":"paciente@cuidarteplus.com","telefono":"+56981234567","direccion":"Av. Providencia 123","contacto_emergencia_nombre":"María Pérez","contacto_emergencia_telefono":"+56999887766","contacto_emergencia_relacion":"Esposa","tipo_prevision":"Fonasa","tiene_convenio":true,"grupo_sanguineo":"O+","alergias":"Ninguna","enfermedades_cronicas":"Hipertensión","discapacidades":"Ninguna","obse
+
+> GET /pacientes/1  [Authorization: Bearer <token>]
+< HTTP 200  (3 ms)
+  {"id":"1","rut":"11111111-1","primer_nombre":"Juan","apellido_paterno":"Pérez","apellido_materno":"Gómez","fecha_nacimiento":"1985-03-14T00:00:00.000Z","sexo":"M","nacionalidad":"Chilena","estado_civil":"casado","email":"paciente@cuidarteplus.com","telefono":"+56981234567","direccion":"Av. Providencia 123","contacto_emergencia_nombre":"María Pérez","contacto_emergencia_telefono":"+56999887766","contacto_emergencia_relacion":"Esposa","tipo_prevision":"Fonasa","tiene_convenio":true,"grupo_sanguineo":"O+","alergias":"Ninguna","enfermedades_cronicas":"Hipertensión","discapacidades":"Ninguna","obse
+
+> GET /pacientes/1  [Authorization: Bearer <token>]
+< HTTP 200  (3 ms)
+  {"id":"1","rut":"11111111-1","primer_nombre":"Juan","apellido_paterno":"Pérez","apellido_materno":"Gómez","fecha_nacimiento":"1985-03-14T00:00:00.000Z","sexo":"M","nacionalidad":"Chilena","estado_civil":"casado","email":"paciente@cuidarteplus.com","telefono":"+56981234567","direccion":"Av. Providencia 123","contacto_emergencia_nombre":"María Pérez","contacto_emergencia_telefono":"+56999887766","contacto_emergencia_relacion":"Esposa","tipo_prevision":"Fonasa","tiene_convenio":true,"grupo_sanguineo":"O+","alergias":"Ninguna","enfermedades_cronicas":"Hipertensión","discapacidades":"Ninguna","obse
+
+> GET /examenes  [Authorization: Bearer <token>]
+< HTTP 200  (5004 ms)
+  [{"id":"5","tipo_examen_medico_id":"2","paciente_id":"1","diagnosis":"Colesterol LDL levemente elevado","tratamiento":null,"observaciones":"Perfil lipídico de control","notas":null,"created_at":"2026-10-19T04:04:30.437Z","tipo_examen_nombre":"Perfil lipídico","paciente_rut":"11111111-1","paciente_primer_nombre":"Juan","paciente_apellido_paterno":"Pérez","paciente_apellido_materno":"Gómez"},{"id":"4","tipo_examen_medico_id":"1","paciente_id":"3","diagnosis":"Sin hallazgos","tratamiento":null,"observaciones":"Control glicémico","notas":null,"created_at":"2026-10-19T04:04:20.339Z","tipo_examen_no
+
+> GET /examenes  [Authorization: Bearer <token>]
+< HTTP 200  (5005 ms)
+  [{"id":"5","tipo_examen_medico_id":"2","paciente_id":"1","diagnosis":"Colesterol LDL levemente elevado","tratamiento":null,"observaciones":"Perfil lipídico de control","notas":null,"created_at":"2026-10-19T04:04:30.437Z","tipo_examen_nombre":"Perfil lipídico","paciente_rut":"11111111-1","paciente_primer_nombre":"Juan","paciente_apellido_paterno":"Pérez","paciente_apellido_materno":"Gómez"},{"id":"4","tipo_examen_medico_id":"1","paciente_id":"3","diagnosis":"Sin hallazgos","tratamiento":null,"observaciones":"Control glicémico","notas":null,"created_at":"2026-10-19T04:04:20.339Z","tipo_examen_no
+
+> GET /examenes  [Authorization: Bearer <token>]
+< HTTP 200  (5005 ms)
+  [{"id":"5","tipo_examen_medico_id":"2","paciente_id":"1","diagnosis":"Colesterol LDL levemente elevado","tratamiento":null,"observaciones":"Perfil lipídico de control","notas":null,"created_at":"2026-10-19T04:04:30.437Z","tipo_examen_nombre":"Perfil lipídico","paciente_rut":"11111111-1","paciente_primer_nombre":"Juan","paciente_apellido_paterno":"Pérez","paciente_apellido_materno":"Gómez"},{"id":"4","tipo_examen_medico_id":"1","paciente_id":"3","diagnosis":"Sin hallazgos","tratamiento":null,"observaciones":"Control glicémico","notas":null,"created_at":"2026-10-19T04:04:20.339Z","tipo_examen_no
+
+> GET /pacientes  [Authorization: Bearer <token>]
+< HTTP 200  (5007 ms)
+  [{"id":"22","rut":"22333444-5","primer_nombre":"<img src=x onerror=alert(1)>","apellido_paterno":"<script>alert('XSS')</script>","apellido_materno":null,"fecha_nacimiento":"1980-01-01T00:00:00.000Z","sexo":"M","nacionalidad":null,"estado_civil":null,"email":"xss@mail.cl","telefono":null,"direccion":null,"contacto_emergencia_nombre":null,"contacto_emergencia_telefono":null,"contacto_emergencia_relacion":null,"tipo_prevision":null,"tiene_convenio":false,"grupo_sanguineo":null,"alergias":null,"enfermedades_cronicas":null,"discapacidades":null,"observaciones_medicas_generales":null,"usuario_id":nu
+
+> GET /pacientes  [Authorization: Bearer <token>]
+< HTTP 200  (5005 ms)
+  [{"id":"22","rut":"22333444-5","primer_nombre":"<img src=x onerror=alert(1)>","apellido_paterno":"<script>alert('XSS')</script>","apellido_materno":null,"fecha_nacimiento":"1980-01-01T00:00:00.000Z","sexo":"M","nacionalidad":null,"estado_civil":null,"email":"xss@mail.cl","telefono":null,"direccion":null,"contacto_emergencia_nombre":null,"contacto_emergencia_telefono":null,"contacto_emergencia_relacion":null,"tipo_prevision":null,"tiene_convenio":false,"grupo_sanguineo":null,"alergias":null,"enfermedades_cronicas":null,"discapacidades":null,"observaciones_medicas_generales":null,"usuario_id":nu
+
+> GET /pacientes  [Authorization: Bearer <token>]
+< HTTP 200  (5006 ms)
+  [{"id":"22","rut":"22333444-5","primer_nombre":"<img src=x onerror=alert(1)>","apellido_paterno":"<script>alert('XSS')</script>","apellido_materno":null,"fecha_nacimiento":"1980-01-01T00:00:00.000Z","sexo":"M","nacionalidad":null,"estado_civil":null,"email":"xss@mail.cl","telefono":null,"direccion":null,"contacto_emergencia_nombre":null,"contacto_emergencia_telefono":null,"contacto_emergencia_relacion":null,"tipo_prevision":null,"tiene_convenio":false,"grupo_sanguineo":null,"alergias":null,"enfermedades_cronicas":null,"discapacidades":null,"observaciones_medicas_generales":null,"usuario_id":nu
+
+# GET /examenes/2: promedio 3 ms
+# GET /pacientes/1: promedio 3 ms
+# GET /examenes: promedio 5005 ms
+# GET /pacientes: promedio 5006 ms----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-17)
+Obtenido: GET /examenes/2: promedio 3 ms; GET /pacientes/1: promedio 3 ms; GET /examenes: promedio 5005 ms; GET /pacientes: promedio 5006 ms. Los listados y la creación/edición de exámenes superan 5.000 ms por un delayMiddleware(5000) aplicado en código.

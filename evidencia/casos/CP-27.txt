@@ -1,0 +1,13 @@
+CP-27 - Comunicación protegida mediante TLS
+Requerimiento: NFR-SEG-1 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+# Se revisa docker-compose.yml, nginx.conf y app.js: solo 'listen 80' y app.listen(PORT) sobre HTTP; no hay certificado ni redirección.
+> GET /  [sin token]
+< HTTP 200  (1 ms)
+  {"name":"cuidarteplus","status":"ok"}
+
+# HTTPS en :4444 → no disponible (ERR_SSL_PACKET_LENGTH_TOO_LONG)----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-07)
+Obtenido: La API responde en HTTP plano (HTTP 200); HTTPS no disponible (ERR_SSL_PACKET_LENGTH_TOO_LONG). Credenciales, JWT y datos clínicos viajan sin cifrar.

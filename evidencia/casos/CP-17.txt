@@ -1,0 +1,22 @@
+CP-17 - Registro reclamando el RUT de un paciente existente
+Requerimiento: RF-2 / NFR-SEG-4 | Tipo: Seguridad / Protección de datos
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+# Pedro Muñoz (RUT 14.235.678-5, paciente_id 3) tiene ficha y un examen, pero no tiene cuenta de usuario.
+> POST /autenticacion/registro  [sin token]
+  body: {"nombre_usuario":"atacante01","password":"123456","correo":"atacante01@mail.cl","rut":"14.235.678-5"}
+< HTTP 201  (15 ms)
+  {"message":"Usuario registrado exitosamente","usuario":{"id":"5","nombre_usuario":"atacante01","correo":"atacante01@mail.cl","created_at":"2026-10-19T04:04:55.608Z"}}
+
+# JWT de la cuenta nueva: pacienteId=3
+> GET /examenes  [Authorization: Bearer <token>]
+< HTTP 200  (5008 ms)
+  [{"id":"4","tipo_examen_medico_id":"1","paciente_id":"3","diagnosis":"Sin hallazgos","tratamiento":null,"observaciones":"Control glicémico","notas":null,"created_at":"2026-10-19T04:04:20.339Z","tipo_examen_nombre":"Hemograma completo","paciente_rut":"14235678-5","paciente_primer_nombre":"Pedro","paciente_apellido_paterno":"Muñoz","paciente_apellido_materno":"Lagos"}]
+
+> GET /pacientes/3  [Authorization: Bearer <token>]
+< HTTP 200  (10 ms)
+  {"id":"3","rut":"14235678-5","primer_nombre":"Pedro","apellido_paterno":"Muñoz","apellido_materno":"Lagos","fecha_nacimiento":"1978-11-02T00:00:00.000Z","sexo":"M","nacionalidad":"Chilena","estado_civil":"divorciado","email":"pedro.munoz@gmail.com","telefono":"+56982223344","direccion":"Av. Grecia 890","contacto_emergencia_nombre":"Ana Lagos","contacto_emergencia_telefono":"+56993334455","contacto_emergencia_relacion":"Hermana","tipo_prevision":"Fonasa","tiene_convenio":true,"grupo_sanguineo":"B+","alergias":"Ninguna","enfermedades_cronicas":"Diabetes tipo 2","discapacidades":"Ninguna","observ
+----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-06)
+Obtenido: Registro HTTP 201 sin verificar identidad; la cuenta 'atacante01' queda vinculada a la ficha de Pedro Muñoz: GET /examenes HTTP 200 (1 examen/es de Pedro) y GET /pacientes/3 HTTP 200 (alergias, enfermedades, grupo sanguíneo).

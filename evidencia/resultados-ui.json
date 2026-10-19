@@ -1,0 +1,71 @@
+{
+  "CP-21": {
+    "xssSeEjecuto": false,
+    "resultado": "Aprobado con observación (el payload se muestra como texto)"
+  },
+  "CP-37": {
+    "vistas": [
+      {
+        "dispositivo": "iPhone 12",
+        "viewport": "390x664",
+        "vista": "login",
+        "anchoViewport": 390,
+        "anchoContenido": 390,
+        "elementosFueraDePantalla": 0,
+        "scrollHorizontal": false
+      },
+      {
+        "dispositivo": "iPhone 12",
+        "viewport": "390x664",
+        "vista": "home",
+        "anchoViewport": 390,
+        "anchoContenido": 390,
+        "elementosFueraDePantalla": 1,
+        "scrollHorizontal": false
+      },
+      {
+        "dispositivo": "iPad",
+        "viewport": "810x1080",
+        "vista": "login",
+        "anchoViewport": 810,
+        "anchoContenido": 810,
+        "elementosFueraDePantalla": 0,
+        "scrollHorizontal": false
+      },
+      {
+        "dispositivo": "iPad",
+        "viewport": "810x1080",
+        "vista": "home",
+        "anchoViewport": 810,
+        "anchoContenido": 810,
+        "elementosFueraDePantalla": 0,
+        "scrollHorizontal": false
+      }
+    ],
+    "resultado": "Fallido"
+  },
+  "CP-35": {
+    "axeLogin": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3
+      }
+    ],
+    "axeHome": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6
+      }
+    ],
+    "ordenTeclado": [
+      "nombre_usuario",
+      "password",
+      "Entrar",
+      "Regístrate"
+    ],
+    "controlesMenores44pxEnMovil": 4,
+    "resultado": "Fallido (INC-18)"
+  }
+}

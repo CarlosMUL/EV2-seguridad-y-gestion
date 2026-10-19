@@ -1,0 +1,11 @@
+CP-08 - Paciente visualiza solo sus exámenes
+Requerimiento: RF-4.1 / RB-1 | Tipo: Funcional
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> GET /examenes  [Authorization: Bearer <token>]
+< HTTP 200  (5007 ms)
+  [{"id":"5","tipo_examen_medico_id":"2","paciente_id":"1","diagnosis":"Colesterol LDL levemente elevado","tratamiento":null,"observaciones":"Perfil lipídico de control","notas":null,"created_at":"2026-10-19T04:04:30.437Z","tipo_examen_nombre":"Perfil lipídico","paciente_rut":"11111111-1","paciente_primer_nombre":"Juan","paciente_apellido_paterno":"Pérez","paciente_apellido_materno":"Gómez"},{"id":"2","tipo_examen_medico_id":"1","paciente_id":"1","diagnosis":"Sin hallazgos","tratamiento":null,"observaciones":"Paciente presenta mejoría","notas":null,"created_at":"2026-10-19T04:04:10.307Z","tipo_e
+----------------------------------------------------------------------
+RESULTADO: APROBADO
+Obtenido: HTTP 200; 2 exámenes, 0 de otros pacientes. Respuesta en 5007 ms.

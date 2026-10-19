@@ -1,0 +1,26 @@
+CP-19 - Endpoints administrativos sin autenticación
+Requerimiento: NFR-SEG-4 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+# Se crea con el admin un usuario de prueba desechable (ID 7) para el intento de borrado sin token.
+> POST /roles  [sin token]
+  body: {"nombre":"rol_sin_token"}
+< HTTP 201  (9 ms)
+  {"id":"5","nombre":"rol_sin_token"}
+
+> PUT /roles/5  [sin token]
+  body: {"nombre":"rol_sin_token_editado"}
+< HTTP 200  (8 ms)
+  {"id":"5","nombre":"rol_sin_token_editado"}
+
+> DELETE /roles/5  [sin token]
+< HTTP 200  (7 ms)
+  {"deleted":true}
+
+> DELETE /usuarios/7  [sin token]
+< HTTP 200  (8 ms)
+  {"deleted":true}
+----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-03)
+Obtenido: Sin cabecera Authorization: POST /roles HTTP 201, PUT /roles HTTP 200, DELETE /roles HTTP 200 y DELETE /usuarios/7 HTTP 200. Las operaciones se ejecutan sin autenticación.

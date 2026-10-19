@@ -1,0 +1,25 @@
+CP-14 - Validación frente a SQL Injection
+Requerimiento: NFR-SEG-5 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> POST /autenticacion/login  [sin token]
+  body: {"nombre_usuario":"' OR '1'='1","password":"x' OR '1'='1"}
+< HTTP 401  (3 ms)
+  {"error":"Credenciales inválidas"}
+
+> POST /autenticacion/login  [sin token]
+  body: {"nombre_usuario":"admin'--","password":"x"}
+< HTTP 401  (3 ms)
+  {"error":"Credenciales inválidas"}
+
+> GET /pacientes/buscar/rut/1'%20OR%20'1'%3D'1  [sin token]
+< HTTP 404  (4 ms)
+  {"error":"No encontrado"}
+
+> GET /pacientes/buscar/rut/1%3B%20DROP%20TABLE%20usuarios%3B--  [sin token]
+< HTTP 404  (4 ms)
+  {"error":"No encontrado"}
+----------------------------------------------------------------------
+RESULTADO: APROBADO
+Obtenido: Login con payloads: HTTP 401 / 401; búsqueda por RUT con payloads: HTTP 404 / 404. Todas las consultas usan parámetros ($1), por lo que no hay inyección.

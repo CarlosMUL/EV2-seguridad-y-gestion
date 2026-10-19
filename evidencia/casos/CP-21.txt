@@ -1,0 +1,13 @@
+CP-21 - Intento de XSS almacenado en campos de entrada
+Requerimiento: NFR-SEG-5 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> POST /pacientes  [Authorization: Bearer <token>]
+  body: {"rut":"22.333.444-5","primer_nombre":"<img src=x onerror=alert(1)>","apellido_paterno":"<script>alert('XSS')</script>","fecha_nacimiento":"1980-01-01","sexo":"M","email":"xss@mail.cl"}
+< HTTP 201  (10 ms)
+  {"id":"22","rut":"22333444-5","primer_nombre":"<img src=x onerror=alert(1)>","apellido_paterno":"<script>alert('XSS')</script>","apellido_materno":null,"fecha_nacimiento":"1980-01-01T00:00:00.000Z","sexo":"M","nacionalidad":null,"estado_civil":null,"email":"xss@mail.cl","telefono":null,"direccion":null,"contacto_emergencia_nombre":null,"contacto_emergencia_telefono":null,"contacto_emergencia_relacion":null,"tipo_prevision":null,"tiene_convenio":false,"grupo_sanguineo":null,"alergias":null,"enfermedades_cronicas":null,"discapacidades":null,"observaciones_medicas_generales":null,"usuario_id":nul
+
+# El payload se guarda sin sanitizar en BD. Se verifica en la interfaz (captura evidencia/ui/pacientes-xss.png, generada por ui-tests.js) que React lo muestra escapado sin ejecutarlo.----------------------------------------------------------------------
+RESULTADO: APROBADO
+Obtenido: HTTP 201: el backend almacena el payload tal cual (sin sanitizar), pero la interfaz React lo renderiza como texto y no se ejecuta script. Se recomienda igualmente validar/sanitizar en backend.

@@ -1,0 +1,71 @@
+services:
+  cuidarteplus-postgres-ev:
+    image: postgres:15-alpine
+    container_name: cuidarteplus-postgres-ev
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-cuidarteplus}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${PORT_POSTGRES:-15442}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./BACKEND/sql/dump-cuidarteplus.sql:/tmp/dump-cuidarteplus.sql:ro
+      - ./BACKEND/sql/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-cuidarteplus}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cuidarteplus-network
+    restart: unless-stopped
+
+  cuidarteplus-backend-ev:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+    container_name: cuidarteplus-backend-ev
+    hostname: cuidarteplus-api
+    environment:
+      - PORT=4000
+      - DATABASE_URL=postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@cuidarteplus-postgres-ev:5432/${POSTGRES_DB:-cuidarteplus}
+      - NODE_ENV=${NODE_ENV:-production}
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - FRONTEND_URL=http://localhost:${PORT_FRONTEND:-3333}
+    ports:
+      - "${PORT_BACKEND:-4444}:4000"
+    depends_on:
+      cuidarteplus-postgres-ev:
+        condition: service_healthy
+    volumes:
+      - ./BACKEND/uploads:/app/uploads
+    networks:
+      - cuidarteplus-network
+    restart: unless-stopped
+
+  cuidarteplus-frontend-ev:
+    build:
+      context: ./FRONTEND
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: "http://localhost:${PORT_BACKEND:-4444}"
+    container_name: cuidarteplus-frontend-ev
+    hostname: cuidarteplus-web
+    ports:
+      - "${PORT_FRONTEND:-3333}:80"
+    depends_on:
+      - cuidarteplus-backend-ev
+    networks:
+      - cuidarteplus-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  cuidarteplus-network:
+    driver: bridge
+    name: cuidarteplus-network
+

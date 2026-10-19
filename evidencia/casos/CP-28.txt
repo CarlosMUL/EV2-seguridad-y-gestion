@@ -1,0 +1,14 @@
+CP-28 - Almacenamiento seguro de contraseñas (hash)
+Requerimiento: NFR-SEG-2 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> POST /autenticacion/registro  [sin token]
+  body: {"nombre_usuario":"paciente_test02","password":"Cuidarte#Test2026","correo":"paciente_test02@mail.cl"}
+< HTTP 201  (11 ms)
+  {"message":"Usuario registrado exitosamente","usuario":{"id":"9","nombre_usuario":"paciente_test02","correo":"paciente_test02@mail.cl","created_at":"2026-10-19T04:05:00.922Z"}}
+
+# Consulta directa: SELECT id, nombre_usuario, contrasena FROM usuarios ORDER BY id; (captura completa en CP-28-db.txt)
+# La contraseña 'Cuidarte#Test2026' aparece tal cual en la columna contrasena.----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-05)
+Obtenido: Registro de paciente_test02 HTTP 201; en la tabla usuarios la contraseña queda como 'Cuidarte#Test2026' (texto plano). Se guardan y comparan en texto plano (auth.js:21, auth.js:110, users.js:36); no se usa bcrypt aunque el campo de la API se llame 'contrasena_hash'.

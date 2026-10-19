@@ -1,0 +1,811 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "cuidarteplus API (español)",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "http://localhost:4444" }],
+  "paths": {
+    "/autenticacion/login": {
+      "post": {
+        "summary": "Iniciar sesión",
+        "description": "Retorna un token JWT que incluye: usuarioId, nombreUsuario, rolId, rolNombre, pacienteId, roles",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre_usuario": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["nombre_usuario", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Token JWT con información del usuario y empresa"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Credenciales inválidas" }
+        }
+      }
+    },
+    "/autenticacion/registro": {
+      "post": {
+        "summary": "Registrar nuevo usuario",
+        "description": "Registra un nuevo usuario con rol de paciente. Si se proporciona RUT, crea o actualiza el paciente asociado.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre_usuario": { "type": "string" },
+                  "password": { "type": "string" },
+                  "correo": { "type": "string" },
+                  "rut": {
+                    "type": "string",
+                    "description": "RUT del paciente (opcional)"
+                  }
+                },
+                "required": ["nombre_usuario", "password", "correo"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario registrado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "usuario": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer" },
+                        "nombre_usuario": { "type": "string" },
+                        "correo": { "type": "string" },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Usuario o correo duplicado, o RUT ya registrado"
+          },
+          "500": { "description": "Error al registrar" }
+        }
+      }
+    },
+    "/usuarios": {
+      "get": {
+        "summary": "Listar usuarios",
+        "description": "Lista todos los usuarios del sistema. Solo disponible para administradores.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "No autorizado" },
+          "403": {
+            "description": "Solo los administradores pueden listar todos los usuarios"
+          }
+        }
+      },
+      "post": {
+        "summary": "Crear usuario",
+        "description": "Crea un nuevo usuario.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre_usuario": { "type": "string" },
+                  "correo": { "type": "string" },
+                  "contrasena_hash": { "type": "string" },
+                  "rol_id": {
+                    "type": "integer",
+                    "description": "ID del rol a asignar"
+                  }
+                },
+                "required": ["nombre_usuario", "correo", "contrasena_hash"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Usuario creado" },
+          "400": { "description": "Datos inválidos" },
+          "401": { "description": "No autorizado" },
+          "500": { "description": "Error al crear usuario" }
+        }
+      }
+    },
+    "/usuarios/{id}": {
+      "get": {
+        "summary": "Obtener usuario",
+        "description": "Obtiene la información de un usuario específico, incluyendo su rol. Si el usuario tiene empresaId, obtiene información del usuario en su empresa. Si no tiene empresaId (sistema médico), obtiene información del usuario con sus roles. Pacientes solo pueden ver sus propios datos.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "No autorizado" },
+          "404": { "description": "Usuario no encontrado" }
+        }
+      },
+      "put": {
+        "summary": "Actualizar usuario",
+        "description": "Actualiza la información de un usuario. Solo los administradores pueden editar usuarios. Puede incluir actualización de rol. En sistema de empresas: no se puede cambiar el rol del único administrador ni el propio rol. En sistema médico: pacientes solo pueden actualizar sus propios datos y no pueden cambiar su rol.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre_usuario": { "type": "string" },
+                  "contrasena_hash": { "type": "string" },
+                  "correo": { "type": "string" },
+                  "rol_id": {
+                    "type": "integer",
+                    "description": "ID del rol a asignar"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "No se puede cambiar el rol" },
+          "401": { "description": "No autorizado" },
+          "403": {
+            "description": "Solo los administradores pueden editar usuarios"
+          },
+          "404": { "description": "Usuario no encontrado" }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar usuario",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Usuario no encontrado" }
+        }
+      }
+    },
+    "/pacientes": {
+      "get": {
+        "summary": "Listar pacientes",
+        "description": "Lista todos los pacientes. Requiere rol de médico o admin.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" }
+        }
+      },
+      "post": {
+        "summary": "Crear paciente",
+        "description": "Crea un nuevo paciente. Requiere rol de médico o admin.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PacienteCrear" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Paciente creado" },
+          "400": { "description": "RUT o email ya existe" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" }
+        }
+      }
+    },
+    "/pacientes/{id}": {
+      "get": {
+        "summary": "Obtener paciente",
+        "description": "Obtiene la información de un paciente específico. Médicos y admins pueden ver cualquier paciente. Pacientes solo pueden ver sus propios datos.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" },
+          "404": { "description": "Paciente no encontrado" }
+        }
+      },
+      "put": {
+        "summary": "Actualizar paciente",
+        "description": "Actualiza la información de un paciente. Médicos y admins pueden actualizar cualquier paciente. Pacientes solo pueden actualizar sus propios datos.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PacienteActualizar" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Error de validación" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" },
+          "404": { "description": "Paciente no encontrado" }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar paciente",
+        "description": "Elimina un paciente. Solo admin puede eliminar pacientes.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paciente eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" },
+          "404": { "description": "Paciente no encontrado" }
+        }
+      }
+    },
+    "/examenes": {
+      "get": {
+        "summary": "Listar exámenes médicos",
+        "description": "Lista todos los exámenes médicos. Médicos y admins ven todos los exámenes. Pacientes solo ven sus propios exámenes.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" }
+        }
+      },
+      "post": {
+        "summary": "Crear examen médico",
+        "description": "Crea un nuevo examen médico. Requiere rol de médico o admin.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExamenMedicoCrear" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Examen creado" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" }
+        }
+      }
+    },
+    "/examenes/{id}": {
+      "get": {
+        "summary": "Obtener examen médico",
+        "description": "Obtiene la información de un examen médico específico. Médicos y admins pueden ver cualquier examen. Pacientes solo pueden ver sus propios exámenes.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" },
+          "404": { "description": "Examen no encontrado" }
+        }
+      },
+      "put": {
+        "summary": "Actualizar examen médico",
+        "description": "Actualiza un examen médico. Requiere rol de médico o admin.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExamenMedicoActualizar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Error de validación" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" },
+          "404": { "description": "Examen no encontrado" }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar examen médico",
+        "description": "Elimina un examen médico. Solo admin puede eliminar exámenes.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Examen eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" },
+          "404": { "description": "Examen no encontrado" }
+        }
+      }
+    },
+    "/examenes/paciente/{paciente_id}": {
+      "get": {
+        "summary": "Obtener exámenes por paciente",
+        "description": "Obtiene todos los exámenes médicos de un paciente específico. Médicos y admins pueden ver exámenes de cualquier paciente. Pacientes solo pueden ver sus propios exámenes.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "paciente_id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" }
+        }
+      }
+    },
+    "/documentos": {
+      "post": {
+        "summary": "Subir documento de examen",
+        "description": "Sube un documento asociado a un examen médico. Requiere rol de médico o admin. Solo se permite un archivo por examen (PDF, JPG, PNG).",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "examen_medico_id": { "type": "integer" },
+                  "paciente_id": { "type": "integer" },
+                  "documento": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Un archivo (PDF, JPG, PNG)"
+                  }
+                },
+                "required": ["examen_medico_id", "paciente_id", "documento"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Documento subido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "documento": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer" },
+                        "nombre_archivo": { "type": "string" },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Error de validación" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" }
+        }
+      }
+    },
+    "/documentos/examen/{examen_id}": {
+      "get": {
+        "summary": "Listar documentos de un examen",
+        "description": "Lista todos los documentos asociados a un examen médico. Médicos y admins pueden ver documentos de cualquier examen. Pacientes solo pueden ver documentos de sus propios exámenes.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "examen_id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" }
+        }
+      }
+    },
+    "/documentos/{id}": {
+      "get": {
+        "summary": "Descargar documento",
+        "description": "Descarga un documento específico. Médicos y admins pueden descargar cualquier documento. Pacientes solo pueden descargar sus propios documentos.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo (PDF, JPG o PNG)",
+            "content": {
+              "application/pdf": {
+                "schema": { "type": "string", "format": "binary" }
+              },
+              "image/jpeg": {
+                "schema": { "type": "string", "format": "binary" }
+              },
+              "image/png": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" },
+          "404": { "description": "Documento no encontrado" }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar documento",
+        "description": "Elimina un documento. Solo admin puede eliminar documentos.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Documento eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "No autorizado" },
+          "403": { "description": "No tiene permisos" },
+          "404": { "description": "Documento no encontrado" }
+        }
+      }
+    },
+    "/tipo-examen": {
+      "get": {
+        "summary": "Listar tipos de examen",
+        "description": "Lista todos los tipos de examen médico disponibles.",
+        "responses": {
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/tipo-examen/{id}": {
+      "get": {
+        "summary": "Obtener tipo de examen",
+        "description": "Obtiene la información de un tipo de examen específico.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "404": { "description": "Tipo de examen no encontrado" }
+        }
+      }
+    },
+    "/auditoria": {
+      "get": {
+        "summary": "Listar auditoría",
+        "description": "Lista todos los registros de auditoría. Si el usuario tiene empresaId, lista registros de su empresa. Si no tiene empresaId (sistema médico), solo admin puede ver todos los registros.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "No autorizado" },
+          "403": {
+            "description": "Solo administradores pueden ver los registros de auditoría"
+          }
+        }
+      }
+    },
+    "/roles": {
+      "get": {
+        "summary": "Listar roles",
+        "responses": { "200": { "description": "OK" } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Cliente": {
+        "type": "object",
+        "properties": {
+          "nombre": { "type": "string" },
+          "correo": { "type": "string" },
+          "telefono": { "type": "string" },
+          "direccion": { "type": "string" },
+          "es_empresa": { "type": "boolean" },
+          "nombre_banco": { "type": "string" },
+          "numero_cuenta": { "type": "string" },
+          "titular_cuenta": { "type": "string" }
+        },
+        "required": ["nombre", "correo"],
+        "description": "El campo empresa_id se obtiene automáticamente del token JWT"
+      },
+      "Empresa": {
+        "type": "object",
+        "properties": {
+          "nombre": { "type": "string" },
+          "direccion": { "type": "string" },
+          "telefono": { "type": "string" },
+          "correo": { "type": "string" }
+        },
+        "required": ["nombre", "correo"]
+      },
+      "EmpresaConUsuario": {
+        "type": "object",
+        "properties": {
+          "usuario": {
+            "type": "object",
+            "properties": {
+              "nombre_usuario": { "type": "string" },
+              "contrasena_hash": { "type": "string" },
+              "correo": { "type": "string" }
+            },
+            "required": ["nombre_usuario", "contrasena_hash", "correo"]
+          },
+          "empresa": {
+            "$ref": "#/components/schemas/Empresa"
+          }
+        },
+        "required": ["usuario", "empresa"]
+      },
+      "PacienteCrear": {
+        "type": "object",
+        "properties": {
+          "rut": { "type": "string" },
+          "primer_nombre": { "type": "string" },
+          "apellido_paterno": { "type": "string" },
+          "apellido_materno": { "type": "string" },
+          "fecha_nacimiento": { "type": "string", "format": "date" },
+          "sexo": { "type": "string", "enum": ["M", "F", "O"] },
+          "nacionalidad": { "type": "string" },
+          "estado_civil": { "type": "string" },
+          "email": { "type": "string" },
+          "telefono": { "type": "string" },
+          "direccion": { "type": "string" },
+          "contacto_emergencia_nombre": { "type": "string" },
+          "contacto_emergencia_telefono": { "type": "string" },
+          "contacto_emergencia_relacion": { "type": "string" },
+          "tipo_prevision": { "type": "string" },
+          "tiene_convenio": { "type": "boolean" },
+          "grupo_sanguineo": { "type": "string" },
+          "alergias": { "type": "string" },
+          "enfermedades_cronicas": { "type": "string" },
+          "discapacidades": { "type": "string" },
+          "observaciones_medicas_generales": { "type": "string" },
+          "usuario_id": { "type": "integer" }
+        },
+        "required": [
+          "rut",
+          "primer_nombre",
+          "apellido_paterno",
+          "fecha_nacimiento",
+          "sexo",
+          "email"
+        ]
+      },
+      "PacienteActualizar": {
+        "type": "object",
+        "properties": {
+          "rut": { "type": "string" },
+          "primer_nombre": { "type": "string" },
+          "apellido_paterno": { "type": "string" },
+          "apellido_materno": { "type": "string" },
+          "fecha_nacimiento": { "type": "string", "format": "date" },
+          "sexo": { "type": "string", "enum": ["M", "F", "O"] },
+          "nacionalidad": { "type": "string" },
+          "estado_civil": { "type": "string" },
+          "email": { "type": "string" },
+          "telefono": { "type": "string" },
+          "direccion": { "type": "string" },
+          "contacto_emergencia_nombre": { "type": "string" },
+          "contacto_emergencia_telefono": { "type": "string" },
+          "contacto_emergencia_relacion": { "type": "string" },
+          "tipo_prevision": { "type": "string" },
+          "tiene_convenio": { "type": "boolean" },
+          "grupo_sanguineo": { "type": "string" },
+          "alergias": { "type": "string" },
+          "enfermedades_cronicas": { "type": "string" },
+          "discapacidades": { "type": "string" },
+          "observaciones_medicas_generales": { "type": "string" },
+          "usuario_id": { "type": "integer" }
+        }
+      },
+      "ExamenMedicoCrear": {
+        "type": "object",
+        "properties": {
+          "tipo_examen_medico_id": { "type": "integer" },
+          "paciente_id": { "type": "integer" },
+          "diagnosis": { "type": "string" },
+          "tratamiento": { "type": "string" },
+          "observaciones": { "type": "string" },
+          "notas": { "type": "string" }
+        },
+        "required": ["tipo_examen_medico_id", "paciente_id"]
+      },
+      "ExamenMedicoActualizar": {
+        "type": "object",
+        "properties": {
+          "tipo_examen_medico_id": { "type": "integer" },
+          "paciente_id": { "type": "integer" },
+          "diagnosis": { "type": "string" },
+          "tratamiento": { "type": "string" },
+          "observaciones": { "type": "string" },
+          "notas": { "type": "string" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT obtenido del endpoint /autenticacion/login. Incluye: usuarioId, nombreUsuario, rolId, rolNombre, pacienteId, roles"
+      }
+    }
+  }
+}

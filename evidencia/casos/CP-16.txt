@@ -1,0 +1,11 @@
+CP-16 - Consulta de ficha clínica por RUT sin autenticación
+Requerimiento: NFR-SEG-4 / NFR-SEG-8 | Tipo: Seguridad / Protección de datos
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> GET /pacientes/buscar/rut/16789456-K  [sin token]
+< HTTP 200  (2 ms)
+  {"id":"2","rut":"16789456-K","primer_nombre":"María","apellido_paterno":"González","apellido_materno":"Rojas","fecha_nacimiento":"1990-07-22T00:00:00.000Z","sexo":"F","nacionalidad":"Chilena","estado_civil":"soltero","email":"maria.gonzalez@gmail.com","telefono":"+56981112233","direccion":"Los Leones 456","contacto_emergencia_nombre":"Carlos González","contacto_emergencia_telefono":"+56990001122","contacto_emergencia_relacion":"Padre","tipo_prevision":"Isapre","tiene_convenio":false,"grupo_sanguineo":"A+","alergias":"Penicilina","enfermedades_cronicas":"Ninguna","discapacidades":"Ninguna","obs
+----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-01)
+Obtenido: Sin token se obtiene HTTP 200 con la ficha completa de María González: alergias="Penicilina", enfermedades crónicas="Ninguna", grupo sanguíneo=A+, teléfono y dirección.

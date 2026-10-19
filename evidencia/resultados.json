@@ -1,0 +1,277 @@
+[
+  {
+    "id": "CP-01",
+    "nombre": "Inicio de sesión con credenciales válidas",
+    "requerimiento": "RF-1.1",
+    "tipo": "Funcional",
+    "estado": "Aprobado",
+    "obtenido": "HTTP 200 en 12 ms; JWT emitido con rol 'paciente' y expiración 2 h.",
+    "ms": 12,
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-02",
+    "nombre": "Cierre de sesión y revocación del token",
+    "requerimiento": "RF-1.2 / NFR-SEG-9",
+    "tipo": "Funcional / Seguridad",
+    "estado": "Fallido",
+    "obtenido": "No existe /autenticacion/logout (HTTP 404). El token reutilizado tras cerrar sesión sigue siendo aceptado (HTTP 200).",
+    "incidente": "INC-14",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-04",
+    "nombre": "Registro de cuenta de paciente",
+    "requerimiento": "RF-2",
+    "tipo": "Funcional",
+    "estado": "Aprobado",
+    "obtenido": "Registro HTTP 201; login posterior HTTP 200; se asigna rol 'paciente' y ficha de paciente ID 21 asociada al RUT.",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-06",
+    "nombre": "Médico registra examen médico",
+    "requerimiento": "RF-3.1",
+    "tipo": "Funcional",
+    "estado": "Aprobado",
+    "obtenido": "HTTP 201; examen ID 5 (Perfil lipídico) creado para el paciente 1, visible para el médico (HTTP 200) y para el paciente dueño (HTTP 200). Tiempo de creación 5013 ms (ver CP-32).",
+    "ms": 5013,
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-07",
+    "nombre": "Edición de examen médico",
+    "requerimiento": "RF-3.2",
+    "tipo": "Funcional",
+    "estado": "Aprobado",
+    "obtenido": "PUT HTTP 200; el cambio se refleja en la vista del paciente (GET HTTP 200).",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-08",
+    "nombre": "Paciente visualiza solo sus exámenes",
+    "requerimiento": "RF-4.1 / RB-1",
+    "tipo": "Funcional",
+    "estado": "Aprobado",
+    "obtenido": "HTTP 200; 2 exámenes, 0 de otros pacientes. Respuesta en 5007 ms.",
+    "ms": 5007,
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-10",
+    "nombre": "Adjuntar documento: formato permitido y rechazo de no permitido",
+    "requerimiento": "RF-4.3",
+    "tipo": "Funcional / Seguridad",
+    "estado": "Fallido",
+    "obtenido": "PDF aceptado (HTTP 201); .exe con MIME real rechazado (HTTP 500); .exe con MIME falsificado ACEPTADO (HTTP 201). La validación confía en el Content-Type del cliente y no revisa extensión ni firma del archivo.",
+    "incidente": "INC-10",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-11",
+    "nombre": "Generación de registros de auditoría",
+    "requerimiento": "RF-5.1",
+    "tipo": "Funcional",
+    "estado": "Fallido",
+    "obtenido": "Crear/editar examen y login sí quedan auditados. Pero POST /roles con token responde HTTP 500 (\"invalid input syntax for type bigint: \"admin\"\"): el rol se inserta y luego el log falla porque se guarda el nombre de usuario en una columna numérica. Último registro: \"DOCUMENTOS_CREAR: subió documento \"archivo_ficticio.bin\" para examen ID 2\".",
+    "incidente": "INC-16",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-14",
+    "nombre": "Validación frente a SQL Injection",
+    "requerimiento": "NFR-SEG-5",
+    "tipo": "Seguridad",
+    "estado": "Aprobado",
+    "obtenido": "Login con payloads: HTTP 401 / 401; búsqueda por RUT con payloads: HTTP 404 / 404. Todas las consultas usan parámetros ($1), por lo que no hay inyección.",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-15",
+    "nombre": "Acceso a examen de otro paciente (IDOR)",
+    "requerimiento": "NFR-SEG-4 / RB-1",
+    "tipo": "Seguridad",
+    "estado": "Aprobado",
+    "obtenido": "Examen propio HTTP 200; examen ajeno HTTP 404; exámenes del paciente 2 HTTP 403; documento ajeno HTTP 403. El backend valida la pertenencia del recurso.",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-16",
+    "nombre": "Consulta de ficha clínica por RUT sin autenticación",
+    "requerimiento": "NFR-SEG-4 / NFR-SEG-8",
+    "tipo": "Seguridad / Protección de datos",
+    "estado": "Fallido",
+    "obtenido": "Sin token se obtiene HTTP 200 con la ficha completa de María González: alergias=\"Penicilina\", enfermedades crónicas=\"Ninguna\", grupo sanguíneo=A+, teléfono y dirección.",
+    "incidente": "INC-01",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-17",
+    "nombre": "Registro reclamando el RUT de un paciente existente",
+    "requerimiento": "RF-2 / NFR-SEG-4",
+    "tipo": "Seguridad / Protección de datos",
+    "estado": "Fallido",
+    "obtenido": "Registro HTTP 201 sin verificar identidad; la cuenta 'atacante01' queda vinculada a la ficha de Pedro Muñoz: GET /examenes HTTP 200 (1 examen/es de Pedro) y GET /pacientes/3 HTTP 200 (alergias, enfermedades, grupo sanguíneo).",
+    "incidente": "INC-06",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-18",
+    "nombre": "Escalamiento de privilegios: paciente crea usuario administrador",
+    "requerimiento": "NFR-SEG-4 / RB-2",
+    "tipo": "Seguridad",
+    "estado": "Fallido",
+    "obtenido": "Con token de paciente, POST /usuarios con rol_id=1 responde HTTP 201. La cuenta creada inicia sesión y lista todos los usuarios (HTTP 200).",
+    "incidente": "INC-02",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-19",
+    "nombre": "Endpoints administrativos sin autenticación",
+    "requerimiento": "NFR-SEG-4",
+    "tipo": "Seguridad",
+    "estado": "Fallido",
+    "obtenido": "Sin cabecera Authorization: POST /roles HTTP 201, PUT /roles HTTP 200, DELETE /roles HTTP 200 y DELETE /usuarios/7 HTTP 200. Las operaciones se ejecutan sin autenticación.",
+    "incidente": "INC-03",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-20",
+    "nombre": "Médico se asigna a sí mismo el rol administrador",
+    "requerimiento": "NFR-SEG-4 / RB-2",
+    "tipo": "Seguridad",
+    "estado": "Fallido",
+    "obtenido": "Antes: GET /usuarios HTTP 403. PUT /usuarios/8 con rol_id=1 HTTP 200 → rol 'admin'; tras re-login accede a funciones de administrador (GET /usuarios HTTP 200). La validación no filtra rol_id.",
+    "incidente": "INC-08",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-21",
+    "nombre": "Intento de XSS almacenado en campos de entrada",
+    "requerimiento": "NFR-SEG-5",
+    "tipo": "Seguridad",
+    "estado": "Aprobado",
+    "obtenido": "HTTP 201: el backend almacena el payload tal cual (sin sanitizar), pero la interfaz React lo renderiza como texto y no se ejecuta script. Se recomienda igualmente validar/sanitizar en backend.",
+    "pacienteXss": "22",
+    "obs": "Aprobado con observación",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-22",
+    "nombre": "Paciente modifica datos clínicos de su propia ficha",
+    "requerimiento": "RB-3 / NFR-SEG-4",
+    "tipo": "Seguridad / Integridad",
+    "estado": "Fallido",
+    "obtenido": "HTTP 200: el paciente sobrescribe alergias (\"Ninguna (editado por el paciente)\"), enfermedades crónicas (\"Ninguna\") y grupo sanguíneo (O+ → AB-), datos que solo debería gestionar el médico.",
+    "incidente": "INC-11",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-23",
+    "nombre": "Falsificación de registros de auditoría",
+    "requerimiento": "RF-5.1 / NFR-SEG-6",
+    "tipo": "Seguridad",
+    "estado": "Fallido",
+    "obtenido": "Con token de paciente, POST /auditoria responde HTTP 201 y el registro inventado \"EXAMENES_ELIMINAR: eliminó examen médico ID 999 (registro inventado)\" aparece en la bitácora del administrador. La auditoría pierde valor como evidencia (no repudio).",
+    "incidente": "INC-12",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-24",
+    "nombre": "Exposición de detalles técnicos en mensajes de error",
+    "requerimiento": "NFR-SEG-5",
+    "tipo": "Seguridad",
+    "estado": "Fallido",
+    "obtenido": "GET /examenes/abc HTTP 500 y GET /pacientes/abc HTTP 500; el campo 'glosa' devuelve el mensaje interno de PostgreSQL (\"invalid input syntax for type bigint: \"abc\"\"). El patrón err.message se repite en ~35 puntos del código (ver Semgrep).",
+    "incidente": "INC-15",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-25",
+    "nombre": "Protección contra fuerza bruta en login",
+    "requerimiento": "NFR-SEG-3",
+    "tipo": "Seguridad",
+    "estado": "Fallido",
+    "obtenido": "30 intentos fallidos sin bloqueo, CAPTCHA ni retardo ({\"401\":30}, ≈2 ms por intento); el intento 31 con la clave correcta entra (HTTP 200). Además la clave del admin es 'admin'.",
+    "incidente": "INC-09",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-26",
+    "nombre": "Cabeceras de seguridad y política CORS",
+    "requerimiento": "NFR-SEG-1",
+    "tipo": "Seguridad",
+    "estado": "Fallido",
+    "obtenido": "Access-Control-Allow-Origin: * (acepta cualquier origen); faltan strict-transport-security, x-content-type-options, x-frame-options, content-security-policy. Además se expone X-Powered-By: Express.",
+    "incidente": "INC-13",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-27",
+    "nombre": "Comunicación protegida mediante TLS",
+    "requerimiento": "NFR-SEG-1",
+    "tipo": "Seguridad",
+    "estado": "Fallido",
+    "obtenido": "La API responde en HTTP plano (HTTP 200); HTTPS no disponible (ERR_SSL_PACKET_LENGTH_TOO_LONG). Credenciales, JWT y datos clínicos viajan sin cifrar.",
+    "incidente": "INC-07",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-28",
+    "nombre": "Almacenamiento seguro de contraseñas (hash)",
+    "requerimiento": "NFR-SEG-2",
+    "tipo": "Seguridad",
+    "estado": "Fallido",
+    "obtenido": "Registro de paciente_test02 HTTP 201; en la tabla usuarios la contraseña queda como 'Cuidarte#Test2026' (texto plano). Se guardan y comparan en texto plano (auth.js:21, auth.js:110, users.js:36); no se usa bcrypt aunque el campo de la API se llame 'contrasena_hash'.",
+    "incidente": "INC-05",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-29",
+    "nombre": "Gestión del secreto JWT (falsificación de token)",
+    "requerimiento": "NFR-SEG-9",
+    "tipo": "Seguridad",
+    "estado": "Fallido",
+    "obtenido": "Token falsificado con el secreto publicado en el README accede como administrador: GET /usuarios HTTP 200 (8 usuarios listados).",
+    "incidente": "INC-04",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-31",
+    "nombre": "Paciente no accede a auditoría ni a listado de usuarios",
+    "requerimiento": "RB-1 / RB-2",
+    "tipo": "Seguridad",
+    "estado": "Aprobado",
+    "obtenido": "GET /auditoria HTTP 403; GET /usuarios HTTP 403.",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-32",
+    "nombre": "Tiempo de respuesta de operaciones CRUD < 300 ms",
+    "requerimiento": "NFR-PERF-1",
+    "tipo": "Rendimiento",
+    "estado": "Fallido",
+    "obtenido": "GET /examenes/2: promedio 3 ms; GET /pacientes/1: promedio 3 ms; GET /examenes: promedio 5005 ms; GET /pacientes: promedio 5006 ms. Los listados y la creación/edición de exámenes superan 5.000 ms por un delayMiddleware(5000) aplicado en código.",
+    "incidente": "INC-17",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-35",
+    "nombre": "Accesibilidad de la interfaz (WCAG 2.1 AA)",
+    "requerimiento": "NFR-USAB-1",
+    "tipo": "Usabilidad / Accesibilidad",
+    "estado": "Fallido",
+    "obtenido": "axe-core: [{\"id\":\"color-contrast\",\"impact\":\"serious\",\"nodes\":3}] en Login y [{\"id\":\"color-contrast\",\"impact\":\"serious\",\"nodes\":6}] en dashboard; 4 controles < 44 px en móvil.",
+    "incidente": "INC-18",
+    "fecha": "19-10-2026"
+  },
+  {
+    "id": "CP-37",
+    "nombre": "Visualización responsiva en móvil y tablet",
+    "requerimiento": "NFR-COMPAT-2",
+    "tipo": "Compatibilidad",
+    "estado": "Fallido",
+    "obtenido": "iPhone 12 390x664 /login: scroll horizontal no, 0 elemento(s) fuera de pantalla; iPhone 12 390x664 /home: scroll horizontal no, 1 elemento(s) fuera de pantalla; iPad 810x1080 /login: scroll horizontal no, 0 elemento(s) fuera de pantalla; iPad 810x1080 /home: scroll horizontal no, 0 elemento(s) fuera de pantalla",
+    "fecha": "19-10-2026"
+  }
+]

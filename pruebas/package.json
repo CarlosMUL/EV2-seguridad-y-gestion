@@ -1,0 +1,16 @@
+{
+  "name": "pruebas-cuidarteplus",
+  "version": "1.0.0",
+  "description": "Kit de pruebas del informe EP2 de Cuidarte+ (28 casos priorizados por riesgo)",
+  "private": true,
+  "scripts": {
+    "test:api": "node run-tests.js",
+    "test:ui": "node ui-tests.js",
+    "evidencias": "node render-evidence.js"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "playwright": "^1.48.0",
+    "@axe-core/playwright": "^4.10.0"
+  }
+}

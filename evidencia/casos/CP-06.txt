@@ -1,0 +1,20 @@
+CP-06 - Médico registra examen médico
+Requerimiento: RF-3.1 | Tipo: Funcional
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> POST /examenes  [Authorization: Bearer <token>]
+  body: {"tipo_examen_medico_id":2,"paciente_id":1,"diagnosis":"Colesterol LDL levemente elevado","observaciones":"Perfil lipídico de control"}
+< HTTP 201  (5013 ms)
+  {"id":"5","tipo_examen_medico_id":"2","paciente_id":"1","diagnosis":"Colesterol LDL levemente elevado","tratamiento":null,"observaciones":"Perfil lipídico de control","notas":null,"created_at":"2026-10-19T04:04:30.437Z"}
+
+> GET /examenes/5  [Authorization: Bearer <token>]
+< HTTP 200  (7 ms)
+  {"id":"5","tipo_examen_medico_id":"2","paciente_id":"1","diagnosis":"Colesterol LDL levemente elevado","tratamiento":null,"observaciones":"Perfil lipídico de control","notas":null,"created_at":"2026-10-19T04:04:30.437Z","tipo_examen_nombre":"Perfil lipídico","paciente_rut":"11111111-1","paciente_primer_nombre":"Juan","paciente_apellido_paterno":"Pérez","paciente_apellido_materno":"Gómez"}
+
+> GET /examenes/5  [Authorization: Bearer <token>]
+< HTTP 200  (3 ms)
+  {"id":"5","tipo_examen_medico_id":"2","paciente_id":"1","diagnosis":"Colesterol LDL levemente elevado","tratamiento":null,"observaciones":"Perfil lipídico de control","notas":null,"created_at":"2026-10-19T04:04:30.437Z","tipo_examen_nombre":"Perfil lipídico","paciente_rut":"11111111-1","paciente_primer_nombre":"Juan","paciente_apellido_paterno":"Pérez","paciente_apellido_materno":"Gómez"}
+----------------------------------------------------------------------
+RESULTADO: APROBADO
+Obtenido: HTTP 201; examen ID 5 (Perfil lipídico) creado para el paciente 1, visible para el médico (HTTP 200) y para el paciente dueño (HTTP 200). Tiempo de creación 5013 ms (ver CP-32).

@@ -1,0 +1,17 @@
+CP-23 - Falsificación de registros de auditoría
+Requerimiento: RF-5.1 / NFR-SEG-6 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> POST /auditoria  [Authorization: Bearer <token>]
+  body: {"accion":"EXAMENES_ELIMINAR","detalles":"eliminó examen médico ID 999 (registro inventado)"}
+< HTTP 201  (5 ms)
+  {"id":"33","usuario_id":"3","accion":"EXAMENES_ELIMINAR: eliminó examen médico ID 999 (registro inventado)","fecha_hora":"2026-10-19T04:05:00.809Z"}
+
+> GET /auditoria  [Authorization: Bearer <token>]
+< HTTP 200  (3 ms)
+  [{"id":"33","usuario_id":"3","accion":"EXAMENES_ELIMINAR: eliminó examen médico ID 999 (registro inventado)","fecha_hora":"2026-10-19T04:05:00.809Z","nombre_usuario":"paciente"},{"id":"32","usuario_id":"2","accion":"PACIENTES_ACTUALIZAR: actualizó paciente ID 1","fecha_hora":"2026-10-19T04:05:00.803Z","nombre_usuario":"medico"},{"id":"31","usuario_id":"3","accion":"PACIENTES_ACTUALIZAR: actualizó paciente ID 1","fecha_hora":"2026-10-19T04:05:00.794Z","nombre_usuario":"paciente"},{"id":"30","usuario_id":"2","accion":"PACIENTES_CREAR: creó paciente <img src=x onerror=alert(1)> <script>alert('XSS
+
+# Registro visto por el administrador: paciente | EXAMENES_ELIMINAR: eliminó examen médico ID 999 (registro inventado)----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-12)
+Obtenido: Con token de paciente, POST /auditoria responde HTTP 201 y el registro inventado "EXAMENES_ELIMINAR: eliminó examen médico ID 999 (registro inventado)" aparece en la bitácora del administrador. La auditoría pierde valor como evidencia (no repudio).

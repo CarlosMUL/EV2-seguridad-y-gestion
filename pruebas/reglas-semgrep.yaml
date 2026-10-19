@@ -1,0 +1,86 @@
+rules:
+  - id: jwt-secret-fallback-hardcoded
+    languages: [javascript]
+    severity: ERROR
+    message: "Secreto JWT con valor por defecto hardcodeado. Si falta la variable de entorno se firman tokens con una clave conocida (CWE-798)."
+    metadata: { cwe: "CWE-798", owasp: "A07:2021 - Identification and Authentication Failures" }
+    pattern: process.env.JWT_SECRET || "..."
+  - id: db-credentials-hardcoded
+    languages: [javascript]
+    severity: ERROR
+    message: "Cadena de conexión con credenciales hardcodeadas (CWE-798)."
+    metadata: { cwe: "CWE-798", owasp: "A07:2021" }
+    pattern-regex: postgres://[^:]+:[^@]+@
+  - id: plaintext-password-comparison
+    languages: [javascript]
+    severity: ERROR
+    message: "Contraseña comparada en texto plano contra la BD; no se usa hash (bcrypt/argon2) (CWE-256)."
+    metadata: { cwe: "CWE-256", owasp: "A02:2021 - Cryptographic Failures" }
+    pattern-either:
+      - pattern: $U.contrasena !== $P
+      - pattern: $U.contrasena === $P
+  - id: plaintext-password-insert
+    languages: [javascript]
+    severity: ERROR
+    message: "Contraseña almacenada sin hash en la tabla usuarios (CWE-256)."
+    metadata: { cwe: "CWE-256", owasp: "A02:2021 - Cryptographic Failures" }
+    pattern-regex: (INSERT INTO usuarios \(nombre_usuario, contrasena|contrasena=\$)
+  - id: error-message-leak
+    languages: [javascript]
+    severity: WARNING
+    message: "Se devuelve el mensaje interno del error al cliente (exposición de información, CWE-209)."
+    metadata: { cwe: "CWE-209", owasp: "A05:2021 - Security Misconfiguration" }
+    pattern: "$RES.status(500).json({..., glosa: $ERR.message || $ERR.toString(), ...})"
+  - id: cors-wildcard
+    languages: [javascript]
+    severity: WARNING
+    message: "CORS habilitado para cualquier origen (CWE-942)."
+    metadata: { cwe: "CWE-942", owasp: "A05:2021 - Security Misconfiguration" }
+    pattern: app.use(cors())
+  - id: route-without-auth-check
+    languages: [javascript]
+    severity: ERROR
+    message: "Endpoint que modifica o expone datos sin verificar token/rol (CWE-862 Missing Authorization)."
+    metadata: { cwe: "CWE-862", owasp: "A01:2021 - Broken Access Control" }
+    patterns:
+      - pattern: router.$M($PATH, ..., $FN)
+      - metavariable-regex: { metavariable: $M, regex: ^(get|post|put|delete)$ }
+      - metavariable-pattern:
+          metavariable: $FN
+          patterns:
+            - pattern: async (req, res) => {...}
+            - pattern-not-regex: (getUserFromAuthHeader\(req\)|requireRole\(req)
+  - id: static-files-without-auth
+    languages: [javascript]
+    severity: WARNING
+    message: "Directorio de documentos servido estáticamente sin autenticación (CWE-552)."
+    metadata: { cwe: "CWE-552", owasp: "A01:2021 - Broken Access Control" }
+    pattern: app.use("/files/...", express.static(...))
+  - id: missing-helmet-rate-limit
+    languages: [javascript]
+    severity: INFO
+    message: "La app Express no usa helmet ni rate limiting (cabeceras de seguridad y protección contra fuerza bruta, CWE-307)."
+    metadata: { cwe: "CWE-307", owasp: "A05:2021 / A07:2021" }
+    patterns:
+      - pattern: const app = express();
+      - pattern-not-inside: |
+          ...
+          app.use(helmet(...));
+  - id: artificial-delay
+    languages: [javascript]
+    severity: WARNING
+    message: "Middleware de retardo artificial aplicado a endpoint productivo (afecta NFR de rendimiento)."
+    metadata: { category: performance }
+    pattern: delayMiddleware($MS)
+  - id: content-disposition-unsanitized
+    languages: [javascript]
+    severity: WARNING
+    message: "Nombre de archivo del usuario insertado en cabecera Content-Disposition sin sanitizar (CWE-113)."
+    metadata: { cwe: "CWE-113" }
+    pattern: 'res.setHeader("Content-Disposition", `...${$X.nombre_archivo}...`)'
+  - id: token-in-localstorage
+    languages: [javascript]
+    severity: WARNING
+    message: "Token de sesión guardado en localStorage, accesible desde JavaScript ante un XSS (CWE-922)."
+    metadata: { cwe: "CWE-922", owasp: "A07:2021" }
+    pattern: localStorage.setItem($K, $V)

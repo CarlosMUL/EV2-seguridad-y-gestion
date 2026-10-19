@@ -1,0 +1,17 @@
+CP-28 - Consulta directa a PostgreSQL (contenedor cuidarteplus-postgres-ev)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> SELECT id, nombre_usuario, contrasena FROM usuarios ORDER BY id;
+
+ id | nombre_usuario  |    contrasena     
+----+-----------------+-------------------
+  1 | admin           | admin
+  2 | medico          | medico
+  3 | paciente        | paciente
+  4 | paciente_test01 | Cuidarte#2026Val
+  5 | atacante01      | 123456
+  6 | admin_falso     | 123456
+  8 | medico_test     | medico123
+  9 | paciente_test02 | Cuidarte#Test2026
+(8 rows)
+

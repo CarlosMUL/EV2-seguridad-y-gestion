@@ -1,0 +1,30 @@
+CP-10 - Adjuntar documento: formato permitido y rechazo de no permitido
+Requerimiento: RF-4.3 | Tipo: Funcional / Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> POST /documentos  [Authorization: Bearer <token>]
+< HTTP 201  (5013 ms)
+  {"documento":{"id":"3","nombre_archivo":"informe_examen.pdf","created_at":"2026-10-19T04:04:45.493Z"}}
+
+> POST /documentos  [Authorization: Bearer <token>]
+< HTTP 500  (5005 ms)
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Internal Server Error</pre>
+</body>
+</html>
+
+
+# Mismo .exe enviado declarando Content-Type application/pdf (suplantación de MIME):
+> POST /documentos  [Authorization: Bearer <token>]
+< HTTP 201  (5027 ms)
+  {"documento":{"id":"4","nombre_archivo":"archivo_ficticio.bin","created_at":"2026-10-19T04:04:55.523Z"}}
+----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-10)
+Obtenido: PDF aceptado (HTTP 201); .exe con MIME real rechazado (HTTP 500); .exe con MIME falsificado ACEPTADO (HTTP 201). La validación confía en el Content-Type del cliente y no revisa extensión ni firma del archivo.

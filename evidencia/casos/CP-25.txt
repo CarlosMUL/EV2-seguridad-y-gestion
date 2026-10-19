@@ -1,0 +1,14 @@
+CP-25 - Protección contra fuerza bruta en login
+Requerimiento: NFR-SEG-3 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+# 30 intentos fallidos consecutivos contra 'admin' en 57 ms (≈2 ms c/u). Códigos: {"401":30}. Sin 429, bloqueo, CAPTCHA ni retardo progresivo.
+# Intento 31 con la contraseña correcta (credencial por defecto 'admin'):
+> POST /autenticacion/login  [sin token]
+  body: {"nombre_usuario":"admin","password":"admin"}
+< HTTP 200  (9 ms)
+  {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvSWQiOiIxIiwibm9tYnJlVXN1YXJpbyI6ImFkbWluIiwicm9sSWQiOiIxIiwicm9sTm9tYnJlIjoiYWRtaW4iLCJwYWNpZW50ZUlkIjpudWxsLCJyb2xlcyI6W3siaWQiOiIxIiwibm9tYnJlIjoiYWRtaW4ifV0sImlhdCI6MTc5MjM4MjcwMCwiZXhwIjoxNzkyMzg5OTAwfQ.GIJkdF7xmlrzbmrVGdJfiAIblWRWW6nZWwOBemD3TNY"}
+----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-09)
+Obtenido: 30 intentos fallidos sin bloqueo, CAPTCHA ni retardo ({"401":30}, ≈2 ms por intento); el intento 31 con la clave correcta entra (HTTP 200). Además la clave del admin es 'admin'.

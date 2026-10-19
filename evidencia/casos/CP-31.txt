@@ -1,0 +1,15 @@
+CP-31 - Paciente no accede a auditoría ni a listado de usuarios
+Requerimiento: RB-1 / RB-2 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> GET /auditoria  [Authorization: Bearer <token>]
+< HTTP 403  (2 ms)
+  {"error":"No autorizado","glosa":"Solo los administradores pueden ver los registros de auditoría"}
+
+> GET /usuarios  [Authorization: Bearer <token>]
+< HTTP 403  (2 ms)
+  {"error":"No autorizado","glosa":"Solo los administradores pueden listar todos los usuarios"}
+----------------------------------------------------------------------
+RESULTADO: APROBADO
+Obtenido: GET /auditoria HTTP 403; GET /usuarios HTTP 403.

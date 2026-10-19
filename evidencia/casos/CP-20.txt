@@ -1,0 +1,23 @@
+CP-20 - Médico se asigna a sí mismo el rol administrador
+Requerimiento: NFR-SEG-4 / RB-2 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+# Se usa un médico de prueba (medico_test, ID 8) para no alterar la cuenta 'medico' del dump.
+> GET /usuarios  [Authorization: Bearer <token>]
+< HTTP 403  (2 ms)
+  {"error":"No autorizado","glosa":"Solo los administradores pueden listar todos los usuarios"}
+
+> PUT /usuarios/8  [Authorization: Bearer <token>]
+  body: {"correo":"medico_test@mail.cl","rol_id":1}
+< HTTP 200  (14 ms)
+  {"id":"8","nombre_usuario":"medico_test","correo":"medico_test@mail.cl","created_at":"2026-10-19T04:05:00.730Z","rol_id":"1","rol_nombre":"admin"}
+
+# Re-inicio de sesión con el mismo médico:
+# Payload JWT tras re-login: rolNombre=admin
+> GET /usuarios  [Authorization: Bearer <token>]
+< HTTP 200  (3 ms)
+  [{"id":"8","nombre_usuario":"medico_test","correo":"medico_test@mail.cl","created_at":"2026-10-19T04:05:00.730Z"},{"id":"6","nombre_usuario":"admin_falso","correo":"falso@mail.cl","created_at":"2026-10-19T04:05:00.652Z"},{"id":"5","nombre_usuario":"atacante01","correo":"atacante01@mail.cl","created_at":"2026-10-19T04:04:55.608Z"},{"id":"4","nombre_usuario":"paciente_test01","correo":"paciente_test01@mail.cl","created_at":"2026-10-19T04:04:25.412Z"},{"id":"3","nombre_usuario":"paciente","correo":"paciente@cuidarteplus.com","created_at":"2026-10-19T04:03:55.791Z"},{"id":"2","nombre_usuario":"med
+----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-08)
+Obtenido: Antes: GET /usuarios HTTP 403. PUT /usuarios/8 con rol_id=1 HTTP 200 → rol 'admin'; tras re-login accede a funciones de administrador (GET /usuarios HTTP 200). La validación no filtra rol_id.

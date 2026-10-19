@@ -1,0 +1,18 @@
+CP-26 - Cabeceras de seguridad y política CORS
+Requerimiento: NFR-SEG-1 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> GET /  [sin token]
+  Origin: https://sitio-malicioso.com
+< HTTP 200  (2 ms)
+  {"name":"cuidarteplus","status":"ok"}
+
+# Access-Control-Allow-Origin: *
+# strict-transport-security: (ausente)
+# x-content-type-options: (ausente)
+# x-frame-options: (ausente)
+# content-security-policy: (ausente)
+# x-powered-by: Express----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-13)
+Obtenido: Access-Control-Allow-Origin: * (acepta cualquier origen); faltan strict-transport-security, x-content-type-options, x-frame-options, content-security-policy. Además se expone X-Powered-By: Express.

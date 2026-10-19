@@ -1,0 +1,18 @@
+CP-04 - Registro de cuenta de paciente
+Requerimiento: RF-2 | Tipo: Funcional
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> POST /autenticacion/registro  [sin token]
+  body: {"nombre_usuario":"paciente_test01","password":"Cuidarte#2026Val","correo":"paciente_test01@mail.cl","rut":"21.111.222-3"}
+< HTTP 201  (17 ms)
+  {"message":"Usuario registrado exitosamente","usuario":{"id":"4","nombre_usuario":"paciente_test01","correo":"paciente_test01@mail.cl","created_at":"2026-10-19T04:04:25.412Z"}}
+
+> POST /autenticacion/login  [sin token]
+  body: {"nombre_usuario":"paciente_test01","password":"Cuidarte#2026Val"}
+< HTTP 200  (6 ms)
+  {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c3VhcmlvSWQiOiI0Iiwibm9tYnJlVXN1YXJpbyI6InBhY2llbnRlX3Rlc3QwMSIsInJvbElkIjoiMyIsInJvbE5vbWJyZSI6InBhY2llbnRlIiwicGFjaWVudGVJZCI6IjIxIiwicm9sZXMiOlt7ImlkIjoiMyIsIm5vbWJyZSI6InBhY2llbnRlIn1dLCJpYXQiOjE3OTIzODI2NjUsImV4cCI6MTc5MjM4OTg2NX0.YOzqDkkCrd065b7GevR5PbJDTUzwHTg6nruWsBMivLA"}
+
+# Payload JWT de la cuenta nueva: rolNombre=paciente, pacienteId=21----------------------------------------------------------------------
+RESULTADO: APROBADO
+Obtenido: Registro HTTP 201; login posterior HTTP 200; se asigna rol 'paciente' y ficha de paciente ID 21 asociada al RUT.

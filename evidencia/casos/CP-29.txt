@@ -1,0 +1,13 @@
+CP-29 - Gestión del secreto JWT (falsificación de token)
+Requerimiento: NFR-SEG-9 | Tipo: Seguridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+# Secreto tomado de CodigoFuenteB/README.md (línea 'JWT_SECRET'): 0d1d8132f0fd...
+# Token firmado localmente, sin iniciar sesión, con usuarioId=1 y rol admin.
+> GET /usuarios  [Authorization: Bearer <token>]
+< HTTP 200  (4 ms)
+  [{"id":"9","nombre_usuario":"paciente_test02","correo":"paciente_test02@mail.cl","created_at":"2026-10-19T04:05:00.922Z"},{"id":"8","nombre_usuario":"medico_test","correo":"medico_test@mail.cl","created_at":"2026-10-19T04:05:00.730Z"},{"id":"6","nombre_usuario":"admin_falso","correo":"falso@mail.cl","created_at":"2026-10-19T04:05:00.652Z"},{"id":"5","nombre_usuario":"atacante01","correo":"atacante01@mail.cl","created_at":"2026-10-19T04:04:55.608Z"},{"id":"4","nombre_usuario":"paciente_test01","correo":"paciente_test01@mail.cl","created_at":"2026-10-19T04:04:25.412Z"},{"id":"3","nombre_usuario"
+----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-04)
+Obtenido: Token falsificado con el secreto publicado en el README accede como administrador: GET /usuarios HTTP 200 (8 usuarios listados).

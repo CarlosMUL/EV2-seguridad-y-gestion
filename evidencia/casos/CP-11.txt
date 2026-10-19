@@ -1,0 +1,28 @@
+CP-11 - Generación de registros de auditoría
+Requerimiento: RF-5.1 | Tipo: Funcional
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> GET /auditoria  [Authorization: Bearer <token>]
+< HTTP 200  (7 ms)
+  [{"id":"16","usuario_id":"2","accion":"DOCUMENTOS_CREAR: subió documento \"archivo_ficticio.bin\" para examen ID 2","fecha_hora":"2026-10-19T04:04:55.530Z","nombre_usuario":"medico"},{"id":"15","usuario_id":"2","accion":"DOCUMENTOS_CREAR: subió documento \"informe_examen.pdf\" para examen ID 2","fecha_hora":"2026-10-19T04:04:45.496Z","nombre_usuario":"medico"},{"id":"14","usuario_id":"2","accion":"EXAMENES_ACTUALIZAR: actualizó examen médico ID 2","fecha_hora":"2026-10-19T04:04:35.466Z","nombre_usuario":"medico"},{"id":"13","usuario_id":"2","accion":"EXAMENES_CREAR: creó examen médico ID 5 par
+
+# Últimos registros: 
+  medico | DOCUMENTOS_CREAR: subió documento "archivo_ficticio.bin" para examen ID 2
+  medico | DOCUMENTOS_CREAR: subió documento "informe_examen.pdf" para examen ID 2
+  medico | EXAMENES_ACTUALIZAR: actualizó examen médico ID 2
+  medico | EXAMENES_CREAR: creó examen médico ID 5 para paciente ID 1
+  paciente_test01 | LOGIN: usuario inició sesión
+  paciente_test01 | REGISTRO: nuevo usuario registrado
+# Se crea un rol con token de admin para verificar su registro (roles.js guarda nombreUsuario en vez de usuarioId):
+> POST /roles  [Authorization: Bearer <token>]
+  body: {"nombre":"rol_temporal"}
+< HTTP 500  (9 ms)
+  {"error":"Error al crear rol","glosa":"invalid input syntax for type bigint: \"admin\""}
+
+> GET /auditoria  [Authorization: Bearer <token>]
+< HTTP 200  (15 ms)
+  [{"id":"16","usuario_id":"2","accion":"DOCUMENTOS_CREAR: subió documento \"archivo_ficticio.bin\" para examen ID 2","fecha_hora":"2026-10-19T04:04:55.530Z","nombre_usuario":"medico"},{"id":"15","usuario_id":"2","accion":"DOCUMENTOS_CREAR: subió documento \"informe_examen.pdf\" para examen ID 2","fecha_hora":"2026-10-19T04:04:45.496Z","nombre_usuario":"medico"},{"id":"14","usuario_id":"2","accion":"EXAMENES_ACTUALIZAR: actualizó examen médico ID 2","fecha_hora":"2026-10-19T04:04:35.466Z","nombre_usuario":"medico"},{"id":"13","usuario_id":"2","accion":"EXAMENES_CREAR: creó examen médico ID 5 par
+----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-16)
+Obtenido: Crear/editar examen y login sí quedan auditados. Pero POST /roles con token responde HTTP 500 ("invalid input syntax for type bigint: "admin""): el rol se inserta y luego el log falla porque se guarda el nombre de usuario en una columna numérica. Último registro: "DOCUMENTOS_CREAR: subió documento "archivo_ficticio.bin" para examen ID 2".

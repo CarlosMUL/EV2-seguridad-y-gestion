@@ -1,0 +1,14 @@
+# Dependencias (se reinstalan con npm install)
+node_modules/
+
+# Resultados de reejecuciones locales (la evidencia del informe está en evidencia/)
+pruebas/evidencia/
+
+# Archivos subidos por las pruebas al backend
+CodigoFuenteB/BACKEND/uploads/**/*
+!CodigoFuenteB/BACKEND/uploads/**/
+CodigoFuenteB/reglas-semgrep.yaml
+
+# Sistema
+.DS_Store
+Thumbs.db

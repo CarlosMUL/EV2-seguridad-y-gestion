@@ -1,0 +1,18 @@
+CP-22 - Paciente modifica datos clínicos de su propia ficha
+Requerimiento: RB-3 / NFR-SEG-4 | Tipo: Seguridad / Integridad
+Ambiente: QA local (Express :4444 / PostgreSQL 15 / React build :3333)
+Fecha ejecución: 19-10-2026
+----------------------------------------------------------------------
+> GET /pacientes/1  [Authorization: Bearer <token>]
+< HTTP 200  (4 ms)
+  {"id":"1","rut":"11111111-1","primer_nombre":"Juan","apellido_paterno":"Pérez","apellido_materno":"Gómez","fecha_nacimiento":"1985-03-14T00:00:00.000Z","sexo":"M","nacionalidad":"Chilena","estado_civil":"casado","email":"paciente@cuidarteplus.com","telefono":"+56981234567","direccion":"Av. Providencia 123","contacto_emergencia_nombre":"María Pérez","contacto_emergencia_telefono":"+56999887766","contacto_emergencia_relacion":"Esposa","tipo_prevision":"Fonasa","tiene_convenio":true,"grupo_sanguineo":"O+","alergias":"Ninguna","enfermedades_cronicas":"Hipertensión","discapacidades":"Ninguna","obse
+
+# Valores originales: alergias="Ninguna", enfermedades_cronicas="Hipertensión", grupo_sanguineo=O+
+> PUT /pacientes/1  [Authorization: Bearer <token>]
+  body: {"alergias":"Ninguna (editado por el paciente)","enfermedades_cronicas":"Ninguna","grupo_sanguineo":"AB-"}
+< HTTP 200  (9 ms)
+  {"id":"1","rut":"11111111-1","primer_nombre":"Juan","apellido_paterno":"Pérez","apellido_materno":"Gómez","fecha_nacimiento":"1985-03-14T00:00:00.000Z","sexo":"M","nacionalidad":"Chilena","estado_civil":"casado","email":"paciente@cuidarteplus.com","telefono":"+56981234567","direccion":"Av. Providencia 123","contacto_emergencia_nombre":"María Pérez","contacto_emergencia_telefono":"+56999887766","contacto_emergencia_relacion":"Esposa","tipo_prevision":"Fonasa","tiene_convenio":true,"grupo_sanguineo":"AB-","alergias":"Ninguna (editado por el paciente)","enfermedades_cronicas":"Ninguna","discapaci
+
+# Se restauran los valores originales con el token del médico para no afectar los demás casos.----------------------------------------------------------------------
+RESULTADO: FALLIDO  (INC-11)
+Obtenido: HTTP 200: el paciente sobrescribe alergias ("Ninguna (editado por el paciente)"), enfermedades crónicas ("Ninguna") y grupo sanguíneo (O+ → AB-), datos que solo debería gestionar el médico.
